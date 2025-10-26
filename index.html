@@ -132,13 +132,13 @@
         }
 
         .video-background iframe {
+            position: absolute;
+            top: 50%;
+            left: 50%;
             width: 100vw;
             height: 56.25vw; /* 16:9 aspect ratio */
             min-height: 100vh;
             min-width: 177.77vh; /* 16:9 aspect ratio */
-            position: absolute;
-            top: 50%;
-            left: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
@@ -261,12 +261,16 @@
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .about-image img {
             width: 100%;
-            height: auto;
-            display: block;
+            height: 100%;
+            object-fit: cover;
             transition: transform 0.5s;
             filter: grayscale(30%);
         }
@@ -545,6 +549,10 @@
             .hero h1 {
                 font-size: 2.8rem;
             }
+            
+            .about-image {
+                height: 400px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -579,9 +587,29 @@
                 font-size: 2.2rem;
             }
             
+            .about-image {
+                height: 300px;
+            }
+            
+            /* Адаптация видео для мобильных устройств */
             .video-background iframe {
                 width: 300%;
+                height: 100%;
                 left: -100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .about-image {
+                height: 250px;
             }
         }
     </style>
@@ -630,7 +658,7 @@
             </div>
             <div class="about-content">
                 <div class="about-image">
-                    <img src="https://thumb.cloud.mail.ru/thumb/xw1/photo_2025-10-26_19-18-20.jpg" alt="Тату-мастер Александр">
+                    <img src="https://cloud.mail.ru/public/nYYw/sRYVbNhC2" alt="Тату-мастер Александр">
                 </div>
                 <div class="about-text">
                     <h3>Александр - профессиональный тату-художник</h3>
