@@ -27,6 +27,7 @@
             color: var(--light);
             overflow-x: hidden;
             line-height: 1.6;
+            cursor: pointer; /* Показываем, что сайт интерактивный */
         }
 
         .container {
@@ -135,12 +136,28 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 100vw;
-            height: 56.25vw; /* 16:9 aspect ratio */
-            min-height: 100vh;
-            min-width: 177.77vh; /* 16:9 aspect ratio */
-            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translateX(-50%) translateY(-50%);
             pointer-events: none;
+        }
+
+        /* Для устройств с соотношением сторон больше 16:9 (широкие) */
+        @media (min-aspect-ratio: 16/9) {
+            .video-background iframe {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        /* Для устройств с соотношением сторон меньше 16:9 (высокие) */
+        @media (max-aspect-ratio: 16/9) {
+            .video-background iframe {
+                width: auto;
+                height: 100%;
+            }
         }
 
         .video-overlay {
@@ -590,13 +607,6 @@
             .about-image {
                 height: 300px;
             }
-            
-            /* Адаптация видео для мобильных устройств */
-            .video-background iframe {
-                width: 300%;
-                height: 100%;
-                left: -100%;
-            }
         }
 
         @media (max-width: 480px) {
@@ -610,6 +620,12 @@
             
             .about-image {
                 height: 250px;
+            }
+            
+            .video-background iframe {
+                /* На очень маленьких экранах немного увеличиваем видео для лучшего покрытия */
+                min-width: 120%;
+                min-height: 120%;
             }
         }
     </style>
@@ -658,7 +674,8 @@
             </div>
             <div class="about-content">
                 <div class="about-image">
-                    <img src="https://cloud.mail.ru/home/photo_2025-10-26_19-18-20.jpg?weblink=nYYw%2FsRYVbNhC2" alt="Тату-мастер Александр">
+                    <!-- Фото загружается из папки images в корне проекта -->
+                    <img src="images/master.jpg" alt="Тату-мастер Александр">
                 </div>
                 <div class="about-text">
                     <h3>Александр - профессиональный тату-художник</h3>
@@ -812,13 +829,13 @@
     <!-- Music Player -->
     <div class="music-player">
         <button class="music-toggle" id="musicToggle">
-            <i class="fas fa-pause"></i>
+            <i class="fas fa-play"></i>
         </button>
     </div>
 
     <!-- Hidden YouTube Player -->
     <div id="youtubePlayer" style="display: none;">
-        <iframe id="youtubeIframe" width="0" height="0" src="https://www.youtube.com/embed/CQsVkgjGqBU?autoplay=1&enablejsapi=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=CQsVkgjGqBU" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <iframe id="youtubeIframe" width="0" height="0" src="https://www.youtube.com/embed/CQsVkgjGqBU?enablejsapi=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=CQsVkgjGqBU" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
 
     <script>
@@ -843,24 +860,36 @@
         // Music Player with YouTube
         const musicToggle = document.getElementById('musicToggle');
         const youtubeIframe = document.getElementById('youtubeIframe');
-        let isPlaying = true;
+        let isPlaying = false;
+        let musicInitialized = false;
 
-        // Автовоспроизведение музыки при загрузке страницы
-        window.addEventListener('load', () => {
-            // Музыка автоматически запускается через iframe с autoplay=1
-            // Для надежности добавим дополнительную проверку
-            setTimeout(() => {
+        // Функция для инициализации и воспроизведения музыки
+        function initializeMusic() {
+            if (!musicInitialized) {
+                musicInitialized = true;
+                
+                // Запускаем музыку
                 if (youtubeIframe.contentWindow) {
                     youtubeIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
                 }
-            }, 1000);
-            
-            musicToggle.classList.add('playing');
-            musicToggle.innerHTML = '<i class="fas fa-pause"></i>';
-        });
+                
+                isPlaying = true;
+                musicToggle.classList.add('playing');
+                musicToggle.innerHTML = '<i class="fas fa-pause"></i>';
+                
+                // Удаляем обработчик после первого клика
+                document.removeEventListener('click', initializeMusic);
+            }
+        }
+
+        // Добавляем обработчик клика на весь документ для запуска музыки
+        document.addEventListener('click', initializeMusic);
 
         // Обработчик клика по кнопке музыки
-        musicToggle.addEventListener('click', () => {
+        musicToggle.addEventListener('click', (e) => {
+            // Останавливаем всплытие события, чтобы не сработал initializeMusic
+            e.stopPropagation();
+            
             if (isPlaying) {
                 // Останавливаем музыку
                 youtubeIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
